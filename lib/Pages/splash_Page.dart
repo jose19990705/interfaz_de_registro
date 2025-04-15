@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:interfaz_de_registro/Pages/sing_in_Page.dart';
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
 
@@ -19,7 +20,7 @@ class _SplashPageState extends State<SplashPage> {
     return const Scaffold(
       body: Center(
           child: Image(
-            image: AssetImage("assets/images/logo.png"),
+            image: AssetImage("assets/images/logo.jpg"),
             width: 150,
             height: 150,
           )
@@ -32,7 +33,7 @@ class _SplashPageState extends State<SplashPage> {
     Future.delayed(const Duration(seconds:3 ),()async{
       Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context)=> const CalculadoraNotaPage())
+          MaterialPageRoute(builder: (context)=> const SingInPage())
       );
 
     });
