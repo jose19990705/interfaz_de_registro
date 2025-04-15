@@ -2,57 +2,52 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MyProfilePage extends StatefulWidget {
-  const MyProfilePage({super.key});
+  final String correo;
+
+  const MyProfilePage({super.key, required this.correo});
 
   @override
   State<MyProfilePage> createState() => _MyProfilePageState();
 }
 
 class _MyProfilePageState extends State<MyProfilePage> {
-  String _name = '';
-  String _email = '';
-  String _typeBusiness = '';
-  String _bornDate = '';
+  String nombre = '';
+  String fechaNacimiento = '';
+  String tipoNegocio = '';
+  String correo = '';
 
   @override
   void initState() {
     super.initState();
-    _loadUserData();
+    cargarDatos();
   }
 
-  // Cargar los datos desde SharedPreferences
-  Future<void> _loadUserData() async {
+  void cargarDatos() async {
     final prefs = await SharedPreferences.getInstance();
+    final c = widget.correo;
+
     setState(() {
-      _name = prefs.getString('nombre') ?? '';
-      _email = prefs.getString('correo') ?? '';
-      _typeBusiness = prefs.getString('tipoNegocio') ?? '';
-      _bornDate = prefs.getString('fechaNacimiento') ?? '';
+      nombre = prefs.getString('nombre_$c') ?? 'Desconocido';
+      fechaNacimiento = prefs.getString('fechaNacimiento_$c') ?? 'Desconocida';
+      tipoNegocio = prefs.getString('tipoNegocio_$c') ?? 'No especificado';
+      correo = prefs.getString('correo_$c') ?? c;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Mi Perfil'),
-      ),
+      appBar: AppBar(title: const Text('Mi Perfil')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 16),
-              Text('Nombre: $_name', style: const TextStyle(fontSize: 18)),
-              const SizedBox(height: 8),
-              Text('Correo: $_email', style: const TextStyle(fontSize: 18)),
-              const SizedBox(height: 8),
-              Text('Tipo de Negocio: $_typeBusiness', style: const TextStyle(fontSize: 18)),
-              const SizedBox(height: 8),
-              Text('Fecha de Nacimiento: $_bornDate', style: const TextStyle(fontSize: 18)),
-            ],
-          ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Nombre: $nombre", style: TextStyle(fontSize: 18)),
+            Text("Correo: $correo", style: TextStyle(fontSize: 18)),
+            Text("Fecha de nacimiento: $fechaNacimiento", style: TextStyle(fontSize: 18)),
+            Text("Tipo de negocio: $tipoNegocio", style: TextStyle(fontSize: 18)),
+          ],
         ),
       ),
     );

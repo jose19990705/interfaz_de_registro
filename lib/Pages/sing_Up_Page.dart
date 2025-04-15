@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:interfaz_de_registro/Pages/sing_in_Page.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -15,7 +16,7 @@ class _SingUpPageState extends State<SingUpPage> {
 
   final _name = TextEditingController();
   final _email = TextEditingController();
-  final _password=TextEditingController();
+  final _password = TextEditingController();
 
   String buttonMsg = "Fecha de nacimiento";
   DateTime _bornDate = DateTime.now();
@@ -65,9 +66,7 @@ class _SingUpPageState extends State<SingUpPage> {
                   return null;
                 },
               ),
-              const SizedBox(
-                height: 16,
-              ),
+              const SizedBox(height: 16),
 
               TextFormField(
                 controller: _password,
@@ -81,7 +80,6 @@ class _SingUpPageState extends State<SingUpPage> {
                 validator: (valuec) {
                   if (valuec!.isEmpty) {
                     return "Debe ingresar una contraseña.";
-
                   }
                   return null;
                 },
@@ -133,45 +131,50 @@ class _SingUpPageState extends State<SingUpPage> {
   // Se procede con las siguientes funcionalidades.
   void _onRegisterButtonClicked() async {
     if (!_isOfLegalAge(_bornDate)) {
+      // Mostrar el mensaje si el usuario es menor de edad
       showDialog(
         context: context,
-        builder:
-            (context) => AlertDialog(
-              title: const Text("Menor de edad"),
-              content: const Text(
-                "Debes tener al menos 18 años para el registro.",
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text("OK"),
-                ),
-              ],
+        builder: (context) => AlertDialog(
+          title: const Text("No puedes registrarte"),
+          content: const Text("Lo siento, debes ser mayor de edad para registrarte."),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Cierra el diálogo
+              },
+              child: const Text("Cerrar"),
             ),
+          ],
+        ),
       );
-      return;
+      return; // No continuar con el registro
     }
 
-    // Guardar la información si es mayor de edad
+    // Si es mayor de edad, guardar la información
     await _saveUserData();
 
+    // Mostrar el mensaje de éxito
     showDialog(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text("Su registro fue exitoso"),
-            content: const Text("Gracias por su registro!"),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text("Cerrar"),
-              ),
-
-            ],
+      builder: (context) => AlertDialog(
+        title: const Text("Su registro fue exitoso"),
+        content: const Text("Gracias por su registro!"),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // Cierra el diálogo
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => SingInPage()),
+              );
+            },
+            child: const Text("Cerrar"),
           ),
+        ],
+      ),
     );
-
   }
+
 
   void _showSelectedDate() async {
     final DateTime? newdate = await showDatePicker(
@@ -210,11 +213,16 @@ class _SingUpPageState extends State<SingUpPage> {
   // Con esta función guardaré los datos del usuario.
   Future<void> _saveUserData() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('nombre', _name.text);
-    await prefs.setString('correo', _email.text);
-    await prefs.setString('contraseña', _password.text);
-    await prefs.setString('fechaNacimiento', _bornDate.toIso8601String());
-    await prefs.setString('tipoNegocio', _typeBusiness ?? '');
+    final correo = _email.text;
+
+    await prefs.setString('nombre_$correo', _name.text);
+    await prefs.setString('correo_$correo', correo);
+    await prefs.setString('contraseña_$correo', _password.text);
+    await prefs.setString(
+      'fechaNacimiento_$correo',
+      _bornDate.toIso8601String(),
+    );
+    await prefs.setString('tipoNegocio_$correo', _typeBusiness ?? '');
   }
 }
 
